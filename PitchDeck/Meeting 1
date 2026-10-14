@@ -1,0 +1,39 @@
+# Project Overview
+
+- ChainIQ: a supply chain analytics project using a publicly available dataset
+- Goal: fill skill gaps from the last project, specifically data modelling, SQL transformation, and team delivery
+- Scope: clean data, build a data model, SQL analysis, KPI development, Power BI dashboard and report
+- Timeline: 4 to 6 weeks (deck shows 8 weeks as a conservative framework)
+
+# Dataset and Tech Stack
+
+- Dataset hosted publicly (uploaded in 2019), no API extraction or security concerns
+- No external database (BigQuery/PostgreSQL skipped): everything hosted in GitHub
+- Transformations in Python/PySpark; cleaning via Excel or preferred method
+- SQL for analysis; Power BI for final dashboard and report
+- Machine learning explicitly out of scope (planned for a future project)
+
+# Analytical Focus Areas
+
+- Six core questions:
+  1. Fulfillment and SLA realism (realistic shipment times)
+  2. Profitability from supplies
+  3. Demand trends
+  4. Product performance
+  5. Prioritization based on findings
+  6. Late deliveries and on-time performance
+- KPIs to cover: revenues, discounts, margins, stock reorder points, month-to-month turnover
+
+# Role Assignments
+
+- Rebal: Power BI dashboard and report
+- Samir: data cleaning (starts once added to GitHub)
+- Samriti: SQL analysis and EDA
+- Rotation logic: each person avoids repeating their last project role
+
+# Deliverables and Workflow
+
+- All data, analysis, and outputs pushed to GitHub (single source of truth)
+- 6-page Power BI dashboard, executive recommendations, README with full findings
+- Individual LinkedIn posts per step, rotating between team members
+- Pitch deck to be shared in GitHub repo
