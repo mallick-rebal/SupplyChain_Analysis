@@ -1,0 +1,33 @@
+{
+  "all_rows": {
+    "rows": 180519,
+    "orders": 65752,
+    "quantity": 384079,
+    "sales": 36784735.01,
+    "discount_amount": 3730378.4,
+    "net_sales": 33054402.38,
+    "profit": 3966902.97,
+    "late_items": 98977,
+    "customers": 20652,
+    "products": 118,
+    "order_date_min": "2015-01-01 00:00:00",
+    "order_date_max": "2018-01-31 23:38:00"
+  },
+  "excl_canceled_and_fraud": {
+    "rows": 172765,
+    "orders": 62897,
+    "quantity": 367591,
+    "sales": 35214429.65,
+    "discount_amount": 3569808.32,
+    "net_sales": 31644665.08,
+    "profit": 3806420.63,
+    "late_items": 98977
+  },
+  "net_sales_by_market_all_rows": {
+    "Africa": 2061679.39,
+    "Europe": 9769198.32,
+    "LATAM": 9235762.09,
+    "Pacific Asia": 7434262.65,
+    "USCA": 4553499.92
+  }
+}

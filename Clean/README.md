@@ -9,7 +9,8 @@ Owner: **Samir** · Downstream: Samriti (star schema + SQL) → Rebal (Power BI)
 | Cleaned order items (one flat table) | `Data/Cleaned/order_items_clean.parquet` (+ `.csv`) | Samriti's model, Rebal's Power BI |
 | Control totals | `Data/Cleaned/control_totals.json` | Reconciliation: Python = SQL = Power BI |
 | Column definitions | `Clean/data_dictionary.md` | Everyone |
-| Cleaning decisions | `Clean/cleaning_rules.md` | Everyone / README |
+| Cleaning plan + report | `Clean/cleaning_rules.md`, `Clean/cleaning_report.md` | Everyone / README |
+| Suggested next steps | `Model/handoff_plan.md` | Samriti |
 
 ## Settled decisions (2026-10-14)
 
@@ -26,7 +27,8 @@ Owner: **Samir** · Downstream: Samriti (star schema + SQL) → Rebal (Power BI)
 | `02_cleaning_decisions.ipynb` | Test each rule, before/after, rows affected |
 | `clean_pipeline.py` | Reproducible raw → cleaned script (the real pipeline) |
 | `validate.py` | Quality checks + writes control totals |
-| `cleaning_rules.md` | Decision log |
+| `cleaning_rules.md` | Cleaning plan: every rule with evidence + output schema |
+| `cleaning_report.md` | Why we cleaned it this way: findings and reasoning |
 | `data_dictionary.md` | Output column definitions |
 | `TASKS.md` | Task checklist |
 
