@@ -3,9 +3,9 @@
     "rows": 180519,
     "orders": 65752,
     "quantity": 384079,
-    "sales": 36784735.01,
+    "sales": 36784734.31,
     "discount_amount": 3730378.4,
-    "net_sales": 33054402.38,
+    "net_sales": 33054402.04,
     "profit": 3966902.97,
     "late_items": 98977,
     "customers": 20652,
@@ -17,17 +17,27 @@
     "rows": 172765,
     "orders": 62897,
     "quantity": 367591,
-    "sales": 35214429.65,
+    "sales": 35214428.98,
     "discount_amount": 3569808.32,
-    "net_sales": 31644665.08,
+    "net_sales": 31644664.75,
     "profit": 3806420.63,
     "late_items": 98977
   },
+  "excl_canceled_fraud_and_low_coverage": {
+    "rows": 164572,
+    "orders": 54854,
+    "quantity": 359163,
+    "sales": 32788249.1,
+    "discount_amount": 3324544.6,
+    "net_sales": 29463744.17,
+    "profit": 3529945.89,
+    "late_items": 94268
+  },
   "net_sales_by_market_all_rows": {
-    "Africa": 2061679.39,
-    "Europe": 9769198.32,
-    "LATAM": 9235762.09,
-    "Pacific Asia": 7434262.65,
-    "USCA": 4553499.92
+    "Africa": 2061679.37,
+    "Europe": 9769198.23,
+    "LATAM": 9235761.99,
+    "Pacific Asia": 7434262.58,
+    "USCA": 4553499.87
   }
 }

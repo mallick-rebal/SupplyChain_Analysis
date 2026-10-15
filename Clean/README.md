@@ -23,8 +23,8 @@ Owner: **Samir** · Downstream: Samriti (star schema + SQL) → Rebal (Power BI)
 
 | File | Purpose |
 |---|---|
-| `01_profiling.ipynb` | Explore the raw data; propose rules |
-| `02_cleaning_decisions.ipynb` | Test each rule, before/after, rows affected |
+| `01_profiling.ipynb` | Evidence: profiling of the raw data, every finding → a rule |
+| `02_cleaning_decisions.ipynb` | Before/after for each rule; imports `clean_pipeline.py`, no logic of its own |
 | `clean_pipeline.py` | Reproducible raw → cleaned script (the real pipeline) |
 | `validate.py` | Quality checks + writes control totals |
 | `cleaning_rules.md` | Cleaning plan: every rule with evidence + output schema |

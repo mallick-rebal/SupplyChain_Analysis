@@ -93,11 +93,27 @@ RENAME_MAP = {
 }
 
 DATE_FORMAT = "%m/%d/%Y %H:%M"
+MONEY_COLUMNS = ["product_price", "sales", "discount_amount", "discount_rate", "net_sales", "profit", "profit_ratio"]
+COUNTRY_MAP_FILE = ROOT / "Clean" / "mappings" / "country_es_en.csv"
+# from Oct 2017 the data only covers 2 markets and 31 products (see 01_profiling.ipynb §7)
+LOW_COVERAGE_START = "2017-10-01"
 
 
 def load_raw() -> pd.DataFrame:
     df = pd.read_csv(RAW_FILE, encoding="latin-1")
     df.columns = df.columns.str.strip()
+    return df
+
+
+def fix_shifted_addresses(df: pd.DataFrame) -> pd.DataFrame:
+    """R10: 3 rows where the address slid one column right (city = "CA", state = a zipcode).
+
+    Runs first because it needs Customer Street, which R01 drops.
+    """
+    shifted = df["Customer State"].str.fullmatch(r"\d{5}")
+    df.loc[shifted, "Customer Zipcode"] = df.loc[shifted, "Customer State"].astype(float)
+    df.loc[shifted, "Customer State"] = df.loc[shifted, "Customer City"]
+    df.loc[shifted, "Customer City"] = df.loc[shifted, "Customer Street"]
     return df
 
 
@@ -126,7 +142,9 @@ def fix_formats(df: pd.DataFrame) -> pd.DataFrame:
     """R05 dates, R06 zipcode as 5-char text, R07 round money to 2 dp."""
     for col in ["order_date", "shipping_date"]:
         df[col] = pd.to_datetime(df[col], format=DATE_FORMAT)
-    # TODO R06, R07 (after v0)
+    df["customer_zipcode"] = df["customer_zipcode"].astype("Int64").astype("string").str.zfill(5)
+    for col in MONEY_COLUMNS:
+        df[col] = df[col].round(2)
     return df
 
 
@@ -135,22 +153,37 @@ def standardise_text(df: pd.DataFrame) -> pd.DataFrame:
     text_cols = [c for c in df.columns if pd.api.types.is_string_dtype(df[c])]
     for col in text_cols:
         df[col] = df[col].str.strip().str.replace(r"\s{2,}", " ", regex=True)
-    # TODO R09 (after v0)
+    countries = pd.read_csv(COUNTRY_MAP_FILE).set_index("country_es")["country_en"]
+    for col in ["order_country", "customer_country"]:
+        unmapped = set(df[col]) - set(countries.index)
+        assert not unmapped, f"{col} has countries missing from {COUNTRY_MAP_FILE.name}: {unmapped}"
+        df[col] = df[col].map(countries)
     return df
 
 
 def fix_known_errors(df: pd.DataFrame) -> pd.DataFrame:
-    """R10 shifted address rows, R11 longitude sign, R12 duplicate category name."""
+    """R11 longitude sign, R12 duplicate category name. (R10 runs first, see fix_shifted_addresses.)"""
+    # all stores are in the US / Puerto Rico, so longitude must be negative
+    df["store_longitude"] = -df["store_longitude"].abs()
+    # "Electronics" is used by two category ids in different departments
+    ids_per_name = df.groupby("category_name")["category_id"].transform("nunique")
+    dup = ids_per_name > 1
+    df.loc[dup, "category_name"] = df.loc[dup, "category_name"] + " (" + df.loc[dup, "department_name"] + ")"
     return df
 
 
 def add_flags(df: pd.DataFrame) -> pd.DataFrame:
     """R13 is_canceled, R14 is_suspected_fraud, R16 is_low_coverage_period."""
+    df["is_canceled"] = df["order_status"] == "CANCELED"
+    df["is_suspected_fraud"] = df["order_status"] == "SUSPECTED_FRAUD"
+    df["is_low_coverage_period"] = df["order_date"] >= LOW_COVERAGE_START
     return df
 
 
 def add_derived_fields(df: pd.DataFrame) -> pd.DataFrame:
-    """R15 shipping_delay_days."""
+    """R15 shipping_delay_days (positive = late), placed next to the shipping days."""
+    delay = df["days_shipping_real"] - df["days_shipping_scheduled"]
+    df.insert(df.columns.get_loc("days_shipping_scheduled") + 1, "shipping_delay_days", delay)
     return df
 
 
@@ -160,11 +193,12 @@ def save(df: pd.DataFrame) -> None:
     df.to_csv(OUT_CSV, index=False)
 
 
-def main() -> None:
-    df = load_raw()
-    raw_rows = len(df)
+def clean(raw: pd.DataFrame) -> pd.DataFrame:
+    """Apply every rule in order. Used by main() and by the notebooks."""
     df = (
-        df.pipe(drop_pii)
+        raw.copy()
+        .pipe(fix_shifted_addresses)
+        .pipe(drop_pii)
         .pipe(drop_unused_columns)
         .pipe(rename_columns)
         .pipe(fix_formats)
@@ -173,7 +207,12 @@ def main() -> None:
         .pipe(add_flags)
         .pipe(add_derived_fields)
     )
-    assert len(df) == raw_rows, "rows must never be dropped"
+    assert len(df) == len(raw), "rows must never be dropped"
+    return df
+
+
+def main() -> None:
+    df = clean(load_raw())
     save(df)
     print(f"Saved {len(df):,} rows x {df.shape[1]} cols -> {OUT_PARQUET.relative_to(ROOT)}")
 

@@ -4,7 +4,7 @@
 **Dataset:** DataCo Smart Supply Chain (`DataCoSupplyChainDataset.csv`)
 
 This report explains **what we found in the raw data and why we cleaned it the way we did**.
-The rule-by-rule plan is in [cleaning_rules.md](cleaning_rules.md).
+The rule-by-rule plan is in [cleaning_rules.md](cleaning_rules.md). The evidence, with code and outputs, is in [01_profiling.ipynb](01_profiling.ipynb), and each rule's before/after is in [02_cleaning_decisions.ipynb](02_cleaning_decisions.ipynb).
 
 ---
 
@@ -17,8 +17,9 @@ The rule-by-rule plan is in [cleaning_rules.md](cleaning_rules.md).
 | Duplicate rows | 0 | 0 |
 | PII columns | 5 | 0 |
 | Text in Spanish | country names | English |
+| Validation checks | — | 24, all passing |
 
-**Main principle: fix the data, never hide it.** We removed columns, not rows. Every unusual row (cancelled, fraud, loss-making, low-coverage period) is kept and **flagged**, so any total can be traced back to the raw file. This is what lets us apply our QA rule: *Python = SQL = Power BI*.
+**Main principle: fix the data, never hide it.** We removed columns, not rows. Every unusual row (cancelled, fraud, loss-making, low-coverage period) is kept and **flagged**, so any total can be traced back to the raw file. Rows and orders match the raw file exactly, and money differs only by sub-dollar float rounding (§5). This is what lets us apply our QA rule: *Python = SQL = Power BI*.
 
 ## 2. What the data is
 
@@ -78,13 +79,14 @@ Summing "profit per order" across items is correct, but only if you know it is i
 | Issue | Found | Fix | Why it matters |
 |---|---|---|---|
 | Dates stored as text | 2 columns | Parse to datetime | Needed for trends, MoM / YoY |
-| Puerto Rico zips lost leading zeros | 69,373 rows (`725` instead of `00725`) | 5-char text | Zips are codes, not numbers |
+| Zips lost leading zeros | 75,508 rows: all Puerto Rico (`725` instead of `00725`) + 6,135 north-east US | 5-char text | Zips are codes, not numbers |
 | Spanish country names | 164 countries (`Estados Unidos`, `Alemania`…) | Translate via mapping file | English dashboard; Power BI maps recognise English names |
 | Trailing / double spaces | 21,604 cells (e.g. `"South of  USA "`) | Trim + collapse | Clean labels and safe joins: `"Cameras "` ≠ `"Cameras"` in SQL. (No duplicate categories existed in the raw data, so nothing merged.) |
 | Shifted address columns | 3 rows (city = `"CA"`, state = a zipcode) | Shift values back | Wrong state breaks state-level grouping |
 | Wrong longitude sign | 105 US store rows with positive longitude (would plot in Asia) | Negate | Map visuals |
 | Same name, two categories | `Electronics` = ID 13 (Footwear) and ID 37 (Outdoors) | Add department to the name | Grouping by name would merge two different categories |
-| 1-cent rounding gaps | 4,613 rows where net ≠ sales − discount by $0.01 | Round money to 2 dp | Totals reconcile exactly |
+| Float noise in money | Most money values stored as e.g. `294.980011` | Round money to 2 dp | Clean cents. Totals move < $1 on $36.8M; the **clean** totals are the official control totals |
+| 1-cent gaps | 4,613 rows where net ≠ sales − discount by exactly $0.01 | Keep (source rounding of half-cent discounts) | Validated with ±$0.01 tolerance instead of silently "fixing" revenue |
 
 ## 6. Why we flag instead of delete
 

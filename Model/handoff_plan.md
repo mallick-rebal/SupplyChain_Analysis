@@ -17,25 +17,20 @@ Background on the data: [cleaning report](../Clean/cleaning_report.md) · column
 
 **Timing:** a **v0** file (PII dropped, dates parsed, snake_case names) comes first so you can start the model. The final file has the same column names, so your SQL won't break.
 
-### v0 status — ready (38 columns)
+### Status: final file ready (42 columns)
 
-Done: R01–R05 + R08. Totals match the raw file exactly (see `control_totals.json`).
-**Not in v0 yet** — coming in the final file:
+All 16 cleaning rules are done and all 24 validation checks pass. Column names are the same as in v0, plus `shipping_delay_days` and the three `is_*` flags, so SQL written against v0 still works.
 
-| Missing | Until then |
-|---|---|
-| `order_country` / `customer_country` still in Spanish (R09) | Fine for keys and joins; labels will change |
-| `customer_zipcode` is a float, PR zips missing leading zeros (R06) | Don't use zipcode yet |
-| Money not rounded to 2 dp (R07) | Round totals in SQL to 2 dp when comparing |
-| 3 shifted address rows, 105 wrong longitude signs, duplicate `Electronics` name (R10–R12) | Use `category_id`, not `category_name`, as the key |
-| Flags `is_canceled`, `is_suspected_fraud`, `is_low_coverage_period` and `shipping_delay_days` (R13–R16) | Use `order_status IN ('CANCELED','SUSPECTED_FRAUD')` and `order_date >= '2017-10-01'` |
+- Countries are English, zips are 5-character text, money is rounded to 2 dp.
+- Use `category_id` as the key; names are now unique too (`Electronics (Footwear)` / `Electronics (Outdoors)`).
+- Reconcile against the **current** `control_totals.json`. Rounding moved totals by under $1, so v0 totals are out of date.
 
 ## 2. Five things to know before writing SQL
 
 1. **Profit and sales are item-level.** `profit`, `sales` and `net_sales` are per order item. Summing them is correct; averaging per order needs a `GROUP BY order_id` first.
 2. **Two geographies.** `customer_*` and `store_*` columns are the **store** (US/PR only). `market`, `order_region`, `order_country`… are the **delivery destination**. Use destination for fulfillment questions.
 3. **Last 4 months are thin.** Rows with `is_low_coverage_period = true` (Oct 2017 – Jan 2018) cover only 2 markets and 31 products. Exclude them from trend and MoM/YoY analysis, or you'll show a false 60% drop.
-4. **The SLA is a fixed rule per shipping mode.** Same Day = 0 days, First = 1, Second = 2, Standard = 4. "SLA realism" means comparing real days against this rule.
+4. **The SLA is a fixed rule per shipping mode.** Same Day = 0 days, First = 1, Second = 2, Standard = 4. "SLA realism" means comparing real days against this rule. Early signal: **First Class is late on 100% of items** (always +1 day), Second Class on 80%, Standard Class on 40% (see `Clean/02_cleaning_decisions.ipynb`).
 5. **Cancelled and fraud orders are still in the table.** Filter them deliberately (see §4).
 
 ## 3. Suggested star schema
