@@ -10,3 +10,7 @@ venv/
 
 # OS
 .DS_Store
+
+Model/supplychain.duckdb
+Model/output/
+Analyze/results/
