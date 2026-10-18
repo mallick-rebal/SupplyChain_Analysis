@@ -1,8 +1,10 @@
 -- q05_realistic_sla.sql
--- Question : 02 SLA realism - are the promised shipping times achievable?
+-- Business question : 02 SLA realism (analysis #5 in Model/handoff_plan.md) - are the promised shipping times achievable?
 -- Filter   : excludes canceled + suspected fraud
 -- Method   : compare the fixed SLA per mode with what actually happens.
 --            p90_days = the day count 90% of items really meet ("realistic SLA").
+-- Note     : First Class has zero variation (always 2 days vs a 1-day SLA).
+--            Read it as "the 1-day SLA is unachievable", not "every delivery failed".
 -- Skills   : PERCENTILE_CONT, comparing a business rule against the data
 
 SELECT

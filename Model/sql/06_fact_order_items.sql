@@ -6,6 +6,7 @@
 --           geography_key -> dim_geography, shipping_key -> dim_shipping
 -- Note    : no rows are filtered here. Canceled / fraud / low-coverage rows are
 --           flagged and filtered in the analysis layer.
+--           Joins use IS NOT DISTINCT FROM so a NULL in a key column can't silently drop rows.
 
 CREATE OR REPLACE TABLE fact_order_items AS
 SELECT
@@ -37,10 +38,10 @@ SELECT
     s.is_low_coverage_period
 FROM stg_order_items s
 JOIN dim_geography g
-  ON  g.market        = s.market
-  AND g.order_region  = s.order_region
-  AND g.order_country = s.order_country
-  AND g.order_state   = s.order_state
-  AND g.order_city    = s.order_city
+  ON  g.market        IS NOT DISTINCT FROM s.market
+  AND g.order_region  IS NOT DISTINCT FROM s.order_region
+  AND g.order_country IS NOT DISTINCT FROM s.order_country
+  AND g.order_state   IS NOT DISTINCT FROM s.order_state
+  AND g.order_city    IS NOT DISTINCT FROM s.order_city
 JOIN dim_shipping sh
-  ON  sh.shipping_mode = s.shipping_mode;
+  ON  sh.shipping_mode IS NOT DISTINCT FROM s.shipping_mode;
