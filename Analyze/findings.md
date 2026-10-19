@@ -28,8 +28,8 @@ Source queries are in `Analyze/sql/`. Run any of them with `python Analyze/run_q
 - Net revenue $31.6M, profit $3.8M, margin 12.0% (matches `control_totals.json`).
 - Fan Shop is the largest profit contributor in every market. Book Shop and Discs Shop have the weakest margins (as low as 1.9%), but they are small.
 
-**5. Loss-making items cancel out almost all the profit** (q08)
-- About 1 in 5 items (19%) is sold at a loss. Those items lose $3.7M in total, compared with $3.8M of overall profit.
+**5. Loss-making items wipe out about half of the profit** (q08)
+- About 1 in 5 items (18.7%) is sold at a loss. Profitable items earn $7.5M; loss-making items lose $3.7M, leaving $3.8M net profit.
 - The top 10 products account for most of the losses; the Field & Stream gun safe alone is $693K (19% of all losses).
 - **Recommendation:** review pricing and cost on the top loss-making products first.
 - **Data note:** some products sit in unexpected categories (e.g. the gun safe under "Fishing"). This comes from the source data and should be checked before using category-level results in the deck.

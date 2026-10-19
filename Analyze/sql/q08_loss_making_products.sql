@@ -7,6 +7,7 @@
 
 WITH product_loss AS (
     SELECT
+        p.product_id,
         p.product_name,
         p.category_name,
         COUNT(*)                                                     AS items,
@@ -18,7 +19,7 @@ WITH product_loss AS (
     JOIN dim_product p ON f.product_id = p.product_id
     WHERE NOT f.is_canceled
       AND NOT f.is_suspected_fraud
-    GROUP BY p.product_name, p.category_name
+    GROUP BY p.product_id, p.product_name, p.category_name  -- product_id keeps products separate even if names repeat
 )
 SELECT
     product_name,

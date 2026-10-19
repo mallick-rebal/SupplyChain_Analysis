@@ -2,16 +2,18 @@
 -- Business question : 03 Profitability (analysis #9 in Model/handoff_plan.md)
 --                     Do bigger discounts destroy profit?
 -- Filter   : excludes canceled + suspected fraud
--- Method   : group items into discount bands using the listed discount_rate (0 - 25%)
+-- Method   : group items into discount bands using the EFFECTIVE rate = discount_amount / sales.
+--            (The listed discount_rate doesn't always match the money; see Clean/data_dictionary.md.)
 -- Skills   : CASE banding, aggregation by band
 
 WITH banded AS (
     SELECT
+        f.discount_amount / NULLIF(f.sales, 0) AS effective_rate,
         CASE
-            WHEN f.discount_rate <  0.05 THEN '1. 0-4%'
-            WHEN f.discount_rate <  0.10 THEN '2. 5-9%'
-            WHEN f.discount_rate <  0.15 THEN '3. 10-14%'
-            WHEN f.discount_rate <  0.20 THEN '4. 15-19%'
+            WHEN f.discount_amount / NULLIF(f.sales, 0) <  0.05 THEN '1. 0-4%'
+            WHEN f.discount_amount / NULLIF(f.sales, 0) <  0.10 THEN '2. 5-9%'
+            WHEN f.discount_amount / NULLIF(f.sales, 0) <  0.15 THEN '3. 10-14%'
+            WHEN f.discount_amount / NULLIF(f.sales, 0) <  0.20 THEN '4. 15-19%'
             ELSE                              '5. 20-25%'
         END AS discount_band,
         f.*

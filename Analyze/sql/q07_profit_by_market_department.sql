@@ -1,4 +1,4 @@
--- q07_profit_by_market_category.sql
+-- q07_profit_by_market_department.sql
 -- Business question : 03 Profitability (analysis #7 in Model/handoff_plan.md)
 --                     Where do we make money, and where is margin weak?
 -- Filter   : excludes canceled + suspected fraud (revenue never realised)
