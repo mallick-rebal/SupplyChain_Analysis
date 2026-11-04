@@ -46,7 +46,7 @@ Source queries are in `Analyze/sql/`. Run any of them with `python Analyze/run_q
 ## Product performance (q11–q13)
 
 **8. A handful of products carry the business** (q13)
-- 8 of 118 products (7%) make about 80% of net revenue. The top product, the Field & Stream gun safe, alone makes 19%.
+- 8 of 118 products (7%) make about 85% of net revenue (84.7%; the first 7 make 76.9%). The top product, the Field & Stream gun safe, alone makes 19%.
 - **Recommendation:** fulfillment fixes and stock planning should start with these 8 "A-class" products.
 
 **9. The biggest sellers are "volume drivers", not stars** (q11)
@@ -55,26 +55,30 @@ Source queries are in `Analyze/sql/`. Run any of them with `python Analyze/run_q
 - **Recommendation:** small price or cost improvements on the volume drivers move the most money.
 
 **10. The same products win in every market** (q12)
-- The gun safe is the #1 profit product in all five markets, and the top 3 are nearly identical everywhere. The bottom products are small, low-volume items with near-zero or negative profit.
+- The gun safe is the #1 profit product in all five markets, and the top 3 are nearly identical everywhere.
+- Bottom 3 products are only shown for markets with at least 20 products of 50+ items. Africa has just 9, so its "bottom 3" would actually be big sellers and is left out. In Europe, LATAM, Pacific Asia and USCA the bottom products are small, low-volume items with near-zero or negative profit.
 - **Recommendation:** no market-specific product strategy is needed; a single product focus list works for all markets.
 
 ## Demand trends (q14–q16)
 
 **11. Revenue was flat in 2016 and grew in 2017** (q14, q15)
-- Comparing each month with the same month a year earlier: 2016 was within about ±2% of 2015, while Feb–Sep 2017 grew 2–12% year over year (Sep 2017 +12.5%).
+- Comparing each month with the same month a year earlier: 2016 was mostly within ±2% of 2015 (exceptions: Feb +5.3%, partly because 2016 was a leap year, and Aug +3.3%), while Feb–Sep 2017 grew 2–12% year over year (Sep 2017 +12.5%).
 - The low-coverage months (Oct 2017 – Jan 2018) are excluded, so the thin late-2017 data does not create a false decline.
 
-**12. There is almost no seasonality** (q16)
-- Every month sits within about ±3% of an average month, except February (index 92.5), which is mostly explained by February having fewer days.
+**12. There is essentially no seasonality** (q16)
+- Every month sits within about ±3% of an average month, except February (index 92.5). Measured as revenue per day, the February dip disappears completely (index 99.4), so it comes from February having fewer days, not lower demand.
 - **Recommendation:** capacity planning does not need big seasonal adjustments; keep staffing level through the year.
 
 ## Operations priority (q17)
 
 **13. Where operations should look first** (q17)
 - Priority score per market × category (min. 100 items) = 40% late rate + 35% revenue at risk + 25% volume, each converted to a percentile score first so no single measure dominates through scale. Weights sit at the top of the query and can be changed.
-- Top 5: Europe Fishing, Europe Men's Footwear, LATAM Camping & Hiking, Europe Cleats, LATAM Indoor/Outdoor Games.
-- Europe Fishing ranks #1: high late rate (59%), the 2nd-highest revenue at risk (~$979K) and high volume.
-- **Caveat:** late rates only range from about 50% to 61% across segments, so the late-rate percentile spreads out fairly small real differences. The ranking is a starting point for investigation, not a verdict.
+- #1 is Europe Fishing, which in practice is a single product: the Field & Stream gun safe (see the data note in Finding 5). It has a high late rate (59%), the 2nd-highest revenue at risk (~$979K) and high volume. It should be presented as "the gun safe in Europe", not as a problem with fishing gear.
+- The rest of the top 5 (Europe Men's Footwear, LATAM Camping & Hiking, Europe Cleats, LATAM Indoor/Outdoor Games) are also each driven by one or two products. In this dataset many categories hold a single product (56 of the 119 segments), so q17 shows `products_in_segment` and the ranking largely points at products, not whole categories.
+- **Caveats:**
+  - Late rates only range from 48.8% to 65.8% across segments, so the late-rate percentile spreads out fairly small real differences.
+  - Revenue at risk grows with volume (rank correlation ~0.89), so in practice size carries about 60% of the score, not 25%. That's an accepted design choice, but worth knowing when reading the ranking.
+  - The ranking is a starting point for investigation, not a verdict.
 - **Recommendation:** start operational reviews with the top-ranked segments, and combine with Finding 2: fixing First and Second Class promises lifts every segment at once.
 
 ## Data caveats

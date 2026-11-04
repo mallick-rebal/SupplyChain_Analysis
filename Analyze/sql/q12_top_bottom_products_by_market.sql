@@ -3,7 +3,9 @@
 --                     Are the best and worst products the same in every market?
 -- Filter   : excludes canceled + suspected fraud
 -- Rule     : only products with at least 50 items in that market, so tiny samples don't top the list
--- Output   : top 3 and bottom 3 products by profit in each market
+-- Output   : top 3 products by profit in each market, and bottom 3 only where the market has
+--            at least 20 qualifying products. With fewer (e.g. Africa: 9), the "bottom 3" are
+--            still big sellers and would be misleading.
 -- Skills   : ROW_NUMBER() OVER (PARTITION BY market ...), both directions
 
 WITH product_market AS (
@@ -24,17 +26,20 @@ WITH product_market AS (
 ranked AS (
     SELECT
         *,
+        COUNT(*) OVER (PARTITION BY market)                          AS qualifying_products,
         ROW_NUMBER() OVER (PARTITION BY market ORDER BY profit DESC) AS top_rank,
         ROW_NUMBER() OVER (PARTITION BY market ORDER BY profit ASC)  AS bottom_rank
     FROM product_market
 )
 SELECT
     market,
+    qualifying_products,
     CASE WHEN top_rank <= 3 THEN 'Top ' || top_rank ELSE 'Bottom ' || bottom_rank END AS position,
     product_name,
     items,
     profit,
     margin_pct
 FROM ranked
-WHERE top_rank <= 3 OR bottom_rank <= 3
+WHERE top_rank <= 3
+   OR (bottom_rank <= 3 AND qualifying_products >= 20)
 ORDER BY market, top_rank;

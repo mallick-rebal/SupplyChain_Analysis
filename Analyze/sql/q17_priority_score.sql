@@ -11,6 +11,10 @@
 --                 volume_score  = how many items the segment ships
 --            2. Priority score = 40% late + 35% revenue at risk + 25% volume, shown on 0-100.
 --            Change the weights in the `weights` CTE below; they must add up to 1.
+-- Caveats  : revenue at risk grows with volume (rank correlation ~0.89), so in practice size
+--            carries about 60% of the score, not 25%.
+--            products_in_segment shows when a "category" is really one product
+--            (e.g. Fishing = only the Field & Stream gun safe in every market).
 -- Output   : every segment ranked; the dashboard's Operations Priority page reads this
 -- Skills   : multi-CTE pipeline, PERCENT_RANK() normalisation, weighted score, RANK()
 
@@ -22,6 +26,7 @@ segment AS (
         g.market,
         p.category_name,
         COUNT(*)                                                       AS items,
+        COUNT(DISTINCT p.product_id)                                   AS products_in_segment,
         AVG(CASE WHEN f.is_late THEN 1.0 ELSE 0.0 END)                 AS late_rate,
         SUM(CASE WHEN f.is_late THEN f.net_sales ELSE 0 END)           AS revenue_at_risk,
         SUM(f.net_sales)                                               AS net_revenue
@@ -46,6 +51,7 @@ SELECT
                                                                                AS priority_rank,
     s.market,
     s.category_name,
+    s.products_in_segment,
     s.items,
     ROUND(100 * s.late_rate, 1)                                                AS late_pct,
     ROUND(s.revenue_at_risk, 0)                                                AS revenue_at_risk,
